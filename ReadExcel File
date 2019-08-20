@@ -1,0 +1,75 @@
+package utilities;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class ReadXL {
+
+	XSSFWorkbook book;
+	XSSFSheet sheet;
+	File file;
+	FileInputStream fis;
+
+	public ReadXL(String path) throws IOException {
+		this.file = new File(path);
+		this.fis = new FileInputStream(file);
+		this.book = new XSSFWorkbook(fis);
+	}
+
+	/***
+	 * Return Row Count in Excel File
+	 * @param String {@code}sheetName
+	 * @return
+	 * @throws IOException
+	 */
+	public int getRowCount(String sheetName) throws IOException {
+
+		sheet = book.getSheet(sheetName);
+		int rows = sheet.getLastRowNum();
+		return rows;
+	}
+/***
+ * Return cell Count of a row
+ * @param sheetName
+ * @param rowNum
+ * @return int
+ */
+	public int getCellCount(String sheetName, int rowNum) {
+		sheet = book.getSheet(sheetName);
+		Row row = sheet.getRow(rowNum);
+		int cell = row.getLastCellNum();
+		return cell;
+
+	}
+/***
+ * Read Cell Data based on NUMERIC and String Types  and return String data;
+ * @param sheetName
+ * @param rowNum
+ * @param cellNum
+ * @return String
+ */
+	public String getCellData(String sheetName, int rowNum, int cellNum) {
+		sheet = book.getSheet(sheetName);
+		Row row = sheet.getRow(rowNum);
+		Cell cell = row.getCell(cellNum);
+
+		String cT = cell.getCellType().toString();
+
+		String cellData = "";
+		if (cT.equals("STRING")) {
+			cellData = cell.getStringCellValue();
+		} else if (cT.equals("NUMERIC")) {
+			cellData = String.valueOf(cell.getNumericCellValue());
+		}
+
+		return cellData;
+	}
+}

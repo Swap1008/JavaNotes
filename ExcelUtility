@@ -1,0 +1,130 @@
+package utilities;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+public class ExcelUtility {
+
+	public static String filePath;
+	public static XSSFWorkbook book;
+	public static XSSFSheet sheet;
+	public static FileInputStream fis;
+	public static FileOutputStream fos;
+
+	public ExcelUtility(String path) {
+		filePath = path;
+		try {
+			fis = new FileInputStream(filePath);
+			book = new XSSFWorkbook(fis);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Returns the number of rows present in excel sheet
+	 * 
+	 * @param sheetName
+	 * @return
+	 * @author Swapnil
+	 */
+	public int getRowCount(String sheetName) {
+		sheet = book.getSheet(sheetName);
+		int rows = sheet.getLastRowNum();
+		return rows;
+	}
+
+	/**
+	 * Read Excel sheet Data and returns as String data
+	 * 
+	 * @param {@code String} sheetName
+	 * @param rowNum
+	 * @param cellNum
+	 * @return
+	 * @author Swapnil
+	 */
+	public String readData(String sheetName, int rowNum, int cellNum) {
+		sheet = book.getSheet(sheetName);
+		String data = "";
+		Cell cell = sheet.getRow(rowNum).getCell(cellNum);
+		String cellType = cell.getCellType().toString();
+
+		switch (cellType) {
+		case "STRING":
+			data = cell.getStringCellValue();
+			break;
+		case "NUMERIC":
+			data = String.valueOf(cell.getNumericCellValue());
+			break;
+
+		}
+
+		return data;
+
+	}
+
+	/**
+	 * Creates and writes data to new Cell
+	 * 
+	 * @param sheetName
+	 * @param rowNum
+	 * @param cellNum
+	 * @param cellData
+	 */
+	public void createCell(String sheetName, int rowNum, int cellNum, String cellData) {
+		sheet = book.getSheet(sheetName);
+
+		Row row = sheet.getRow(rowNum);
+		Cell cell = row.createCell(cellNum);
+		cell.setCellValue(cellData);
+
+	}
+
+	/**
+	 * Deletes specified cell from the sheet
+	 * 
+	 * @param sheetName
+	 * @param rowNum
+	 * @param cellNum
+	 */
+	public void deleteCell(String sheetName, int rowNum, int cellNum) {
+		sheet = book.getSheet(sheetName);
+		Row row = sheet.getRow(rowNum);
+		row.removeCell(row.getCell(cellNum));
+	}
+
+	/**
+	 * Writes and saves data to excel workbook and closes open file Stram
+	 * 
+	 * @param filePath
+	 * @author Swapnil
+	 */
+	public void closeFiles(String filePath) {
+		try {
+			fis.close();
+			fos = new FileOutputStream(filePath);
+			book.write(fos);
+			fos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * To create a new Sheet in excel workbook.
+	 * 
+	 * @param sheetName
+	 * @author Swapnil
+	 */
+	public void createNewSheet(String sheetName) {
+		book.createSheet(sheetName);
+	}
+}
